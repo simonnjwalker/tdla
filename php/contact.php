@@ -1,55 +1,51 @@
 <?php
+require_once "c:/php/pear/Mail.php";
+require __DIR__ . "/info.php";
 
-/*
+// Collect and sanitize POST values
+$name    = trim($_POST['name'] ?? '');
+$email   = trim($_POST['email'] ?? '');
+$number  = trim($_POST['number'] ?? '');
+$subject = trim($_POST['subject'] ?? 'Contact Form Submission');
+$message = trim($_POST['message'] ?? '');
 
-    If you can read this, the server that this page is running on is not configured for PHP at this stage
-
-*/
-
-
-// ENTER YOUR EMAIL
-$emailTo = "secretary.tdla@gmail.com";
-
-// ENTER IDENTIFIER
-$emailIdentifier =  "Message sent via contact form from " . $_SERVER["SERVER_NAME"];
-
-
-if($_POST) {
-
-    $name = addslashes(trim($_POST["name"]));
-    $clientEmail = addslashes(trim($_POST["email"]));
-    $message = addslashes(trim($_POST["message"]));
-	$fhp_input = addslashes(trim($_POST["company"]));
-
-    $array = array("nameMessage" => "", "emailMessage" => "", "messageMessage" => "","succesMessage" => "");
-
-    if($name == "") {
-    	$array["nameMessage"] = "x";
-    }
-	
-    if(!filter_var($clientEmail, FILTER_VALIDATE_EMAIL)) {
-        $array["emailMessage"] = "x";
-    }
-	
-    if($message == "") {
-        $array["messageMessage"] = "x";
-    }
-	
-    if($name != "" && filter_var($clientEmail, FILTER_VALIDATE_EMAIL) && $message != "" && $fhp_input == "") {
-		
-		$array["succesMessage"] = "";
-		
-		$headers  = "MIME-Version: 1.0" . "\r\n";
-        $headers .= "Content-type:text/html;charset=UTF-8" . "\r\n";
-		$headers .= "From: " . $name . " <" . $clientEmail .">\r\n";
-		$headers .= "Reply-To: " . $clientEmail;
-		
-		mail($emailTo, $emailIdentifier, $message, $headers);
-		
-    }
-
-    echo json_encode($array);
-
+// Simple validation
+if ($name === '' || !filter_var($email, FILTER_VALIDATE_EMAIL) || $message === '') {
+    http_response_code(400);
+    exit("Invalid form submission.");
 }
 
-?>
+// Construct email body
+$body = "You have received a new contact form submission:\n\n"
+      . "Name:    $name\n"
+      . "Email:   $email\n"
+      . "Phone:   $number\n"
+      . "Subject: $subject\n\n"
+      . "Message:\n$message\n";
+
+// Headers
+$headers = array(
+    'From'    => $from,
+    'To'      => $to,
+    'Subject' => $subject,
+    'Reply-To'=> $email
+);
+
+// SMTP settings
+$smtp = Mail::factory('smtp', array(
+    'host'     => $host,
+    'auth'     => true,
+    'username' => $username,
+    'password' => $password
+));
+
+// Send mail
+$mail = $smtp->send($to, $headers, $body);
+
+// Handle result
+if (PEAR::isError($mail)) {
+    http_response_code(500);
+    echo "Mailer Error: " . $mail->getMessage();
+} else {
+    echo "Message successfully sent!";
+}
