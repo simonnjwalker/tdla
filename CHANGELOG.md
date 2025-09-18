@@ -1,4 +1,8 @@
 
+## [1.0.3] - 2025-09-18
+### Fixed
+- Completed contact email form.  Will send to TDLA Secretary account.
+
 ## [1.0.2] - 2025-09-18
 ### Fixed
 - Updated committee images.
