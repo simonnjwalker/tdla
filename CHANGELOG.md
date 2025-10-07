@@ -1,3 +1,10 @@
+## [1.0.5] - 2025-10-07
+### Fixed
+- Changed membership options and layout.
+
+## [1.0.4] - 2025-10-03
+### Fixed
+- Added logo files.  Some committee details.
 
 ## [1.0.3] - 2025-09-18
 ### Fixed
