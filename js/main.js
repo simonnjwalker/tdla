@@ -24,10 +24,10 @@
 
         if (window.pageYOffset > sticky) {
             header_navbar.classList.add("sticky");
-            logo.setAttribute("src", "images/fulllogo-light.webp")
+            logo.setAttribute("src", "https://tdla.com.au/images/fulllogo-light.webp")
         } else {
             header_navbar.classList.remove("sticky");
-            logo.setAttribute("src", "images/fulllogo-light.webp")
+            logo.setAttribute("src", "https://tdla.com.au/images/fulllogo-light.webp")
         }
 
 

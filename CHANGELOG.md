@@ -1,3 +1,10 @@
+## [1.0.7] - 2026-02-04
+### Updated
+* Changed images to JPG for speed.
+* All links have full paths.
+* Facebook page link updated.
+* instagram link added.
+
 ## [1.0.6] - 2025-11-14
 ### Updated
 * One committee member added.  Names now hyperlinked.
