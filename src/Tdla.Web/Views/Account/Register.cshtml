@@ -1,0 +1,15 @@
+@model AccountInput
+@{ ViewData["Title"] = "Create an account"; }
+<div class="card account-card p-4 p-md-5 mx-auto">
+    <h1 class="h3 mb-3">Create an account</h1>
+    <p class="mb-4">Anyone can create an account. You will not have access to files while signed in until an administrator verifies your account and assigns the appropriate roles.</p>
+    <form method="post" action="/account/register">
+        @Html.AntiForgeryToken()
+        <div asp-validation-summary="All" class="text-danger" role="alert"></div>
+        <partial name="_ProfileFields" />
+        <label asp-for="Email" class="form-label"></label><input asp-for="Email" type="email" class="form-control mb-3" autocomplete="email" required maxlength="256" />
+        <label asp-for="Username" class="form-label"></label><input asp-for="Username" class="form-control mb-3" autocomplete="username" required maxlength="256" />
+        <partial name="_PasswordFields" />
+        <button class="main-btn" type="submit">Create account</button>
+    </form>
+</div>

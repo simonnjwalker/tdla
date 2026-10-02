@@ -1,0 +1,17 @@
+.portal { background: #f9f9f9; }
+.portal-header { background: #2b2a3d; }
+.portal-header .nav-link, .portal-header .navbar-text { color: #fff; }
+.portal-header .nav-link:hover { color: #ff6b6b; }
+.portal .card { border: 1px solid #ececec; border-radius: 8px; box-shadow: 0 5px 18px rgb(43 42 61 / 4%); }
+.portal .account-card { max-width: 580px; }
+.portal .main-btn { border: 0; }
+.portal a { color: #b52e2e; }
+.portal a.main-btn, .portal .navbar-brand { color: #fff; }
+.portal input:focus, .portal textarea:focus, .portal button:focus-visible, .portal a:focus-visible { outline: 3px solid #e84e4e; outline-offset: 3px; }
+.portal .validation-summary-valid { display: none; }
+.portal .validation-summary-errors { margin-bottom: 1rem; }
+.portal .validation-summary-errors ul { list-style: disc; padding-left: 1.25rem; }
+.portal input[type=checkbox] { accent-color: #b52e2e; }
+.portal summary { cursor: pointer; }
+.portal textarea[readonly] { min-width: 100%; font-size: .85rem; }
+.portal .file-description { white-space: pre-wrap; overflow-wrap: anywhere; }

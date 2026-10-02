@@ -1,0 +1,11 @@
+@model List<InviteResult>
+@{ ViewData["Title"] = "Account setup links"; }
+<h1 class="h3 mb-3">Account setup links</h1>
+<p class="mb-4">Links expire after 24 hours and stop working once the password is saved. Share each link only with its account owner. No emails have been sent automatically.</p>
+@foreach (var result in Model)
+{
+    <div class="card p-4 mb-3"><h2 class="h5 mb-2">@result.Email</h2><p>@result.Message</p>
+        @if (result.Url is not null) { <label class="mt-3">Private setup link<textarea class="form-control mt-2" rows="4" readonly>@result.Url</textarea></label> }
+    </div>
+}
+<a class="main-btn" href="/admin">Back to administration</a>

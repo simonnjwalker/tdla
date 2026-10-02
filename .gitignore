@@ -397,3 +397,11 @@ FodyWeavers.xsd
 # JetBrains Rider
 *.sln.iml
 php/info.php
+
+# TDLA application data and publishing secrets
+**/App_Data/
+artifacts/
+.local/
+*.private.json
+*.publishsettings
+*.pubxml.user

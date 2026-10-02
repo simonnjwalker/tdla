@@ -1,0 +1,43 @@
+@model AdminModel
+@{ ViewData["Title"] = "Administration"; }
+<h1 class="h2 mb-4">Administration</h1>
+<div class="row g-4 mb-5">
+    <section class="col-lg-6"><div class="card p-4 h-100">
+        <h2 class="h4 mb-3">Public account registration</h2>
+        <p class="mb-3">New registrations start without private-file access. Assign roles after reviewing each account.</p>
+        <form method="post" action="/admin/registration">@Html.AntiForgeryToken()
+            <label class="d-block mb-3"><input type="checkbox" name="enabled" value="true" checked="@Model.RegistrationEnabled" /> Allow visitors to create accounts</label>
+            <button class="main-btn" type="submit">Save registration setting</button>
+        </form>
+    </div></section>
+    <section class="col-lg-6"><div class="card p-4 h-100">
+        <h2 class="h4 mb-3">Create accounts by email</h2>
+        <form method="post" action="/admin/invite">@Html.AntiForgeryToken()
+            <label for="emails" class="form-label">Email addresses (one or up to 100, separated by commas or new lines)</label>
+            <textarea id="emails" name="emails" class="form-control mb-3" rows="4" required></textarea>
+            <p class="small mb-3">Accounts receive the Member role. You will receive private setup links to share with their owners.</p>
+            <button class="main-btn" type="submit">Create accounts</button>
+        </form>
+    </div></section>
+</div>
+<h2 class="h4 mb-3">Accounts and roles</h2>
+<p class="mb-3">Accounts must be verified before they can access files while signed in. After verification, roles control private-file access. Administrators always have access.</p>
+<div class="table-responsive"><table class="table align-middle"><thead><tr><th scope="col">Account</th><th scope="col">Full name / firm or employer</th><th scope="col">Verified</th><th scope="col">Roles</th><th scope="col">Password</th></tr></thead><tbody>
+@foreach (var account in Model.Users)
+{
+    <tr><td class="text-break">@account.UserName<br /><small>@account.Email</small></td><td>
+        <form id="profile-@(account.Id.ToString("N"))" method="post" action="/admin/@(account.Id.ToString("N"))/profile">@Html.AntiForgeryToken()
+            <label class="d-block mb-2">Full name<input name="fullName" value="@account.FullName" class="form-control" maxlength="200" /></label>
+            <label class="d-block mb-2">Firm / employer<input name="employerName" value="@account.EmployerName" class="form-control" maxlength="200" /></label>
+            <button class="btn btn-outline-secondary btn-sm" type="submit">Save details</button>
+        </form>
+    </td><td><label><input form="profile-@(account.Id.ToString("N"))" name="verified" type="checkbox" value="true" checked="@account.Verified" /> Verified</label></td><td>
+        <form method="post" action="/admin/@(account.Id.ToString("N"))/roles">@Html.AntiForgeryToken()
+            <fieldset><legend class="visually-hidden">Roles for @account.UserName</legend>
+            @foreach (var role in Model.Roles) { <label class="me-3"><input type="checkbox" name="selectedRoles" value="@role" checked="@Model.UserRoles[account.Id].Contains(role)" /> @role</label> }
+            </fieldset><button class="btn btn-outline-danger btn-sm mt-2" type="submit">Save roles</button>
+        </form>
+    </td><td><form method="post" action="/admin/@(account.Id.ToString("N"))/setup">@Html.AntiForgeryToken()<button class="btn btn-outline-secondary btn-sm" type="submit">Get setup/reset link</button></form></td></tr>
+}
+</tbody></table></div>
+<section class="card p-4 mt-4"><h2 class="h4 mb-3">Create a role</h2><form method="post" action="/admin/role">@Html.AntiForgeryToken()<label for="name" class="form-label">Role name</label><input id="name" name="name" pattern="[A-Za-z][A-Za-z0-9_-]{0,39}" maxlength="40" class="form-control mb-3" required /><button class="main-btn" type="submit">Create role</button></form></section>

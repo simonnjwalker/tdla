@@ -1,0 +1,13 @@
+@model AccountInput
+@{ ViewData["Title"] = "Set your password"; }
+<div class="card account-card p-4 p-md-5 mx-auto">
+    <h1 class="h3 mb-3">Set your password</h1>
+    <p class="mb-4">Choose a password for @Model.Email.</p>
+    <form method="post" action="/account/setup">
+        @Html.AntiForgeryToken()
+        <div asp-validation-summary="All" class="text-danger" role="alert"></div>
+        <input asp-for="Email" type="hidden" /><input asp-for="Token" type="hidden" />
+        <partial name="_PasswordFields" />
+        <button class="main-btn" type="submit">Save password</button>
+    </form>
+</div>

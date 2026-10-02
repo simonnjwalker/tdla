@@ -1,0 +1,58 @@
+@model List<ManagedFile>
+@{ ViewData["Title"] = "Files"; List<string> roles = ViewBag.Roles; var admin = User.IsInRole("Administrator"); bool awaitingVerification = ViewBag.AwaitingVerification; }
+<h1 class="h2 mb-3">Association files</h1>
+@if (User.Identity?.IsAuthenticated == true) { <p class="mb-3"><a href="/account/profile">Update my full name and firm/employer</a></p> }
+@if (awaitingVerification)
+{
+    <div class="alert alert-info" role="status">Your account is awaiting verification. You cannot access any files while signed in until an administrator verifies your account. Access to private files then depends on your assigned roles.</div>
+}
+else { <p class="mb-4">@(admin ? "Manage every file, its description, visibility and the roles allowed to download it." : "Browse the files available to you.")</p> }
+@if (admin)
+{
+    <section class="card p-4 mb-4" aria-labelledby="upload-title">
+        <h2 class="h4 mb-3" id="upload-title">Upload a file</h2>
+        <form action="/files/upload" method="post" enctype="multipart/form-data">
+            @Html.AntiForgeryToken()
+            <label for="upload" class="form-label">File (maximum 25 MB)</label><input id="upload" name="upload" type="file" class="form-control mb-3" required />
+            <label for="upload-description" class="form-label">Description (optional, up to 4,000 characters)</label><textarea id="upload-description" name="description" class="form-control mb-3" rows="3" maxlength="4000"></textarea>
+            <div class="form-check"><input id="upload-public" class="form-check-input" type="checkbox" name="isPublic" value="true" /><label for="upload-public" class="form-check-label">Public download — anyone with the link can download</label></div>
+            <div class="form-check mb-3"><input id="upload-listed" class="form-check-input" type="checkbox" name="listed" value="true" checked /><label for="upload-listed" class="form-check-label">Show in the file list to people with access</label></div>
+            <fieldset class="mb-3"><legend class="fs-6">Roles allowed to download private files (admins always have access)</legend>
+            @foreach (var role in roles.Where(r => r != "Administrator")) { <label class="me-3"><input type="checkbox" name="allowedRoles" value="@role" checked="@(role == "Member")" /> @role</label> }
+            </fieldset>
+            <button class="main-btn" type="submit">Upload</button>
+        </form>
+    </section>
+    <p class="small mb-3">Hidden public files remain downloadable by link. Turn off public downloads to restrict access by role. Private files are never served from a static folder.</p>
+}
+@if (Model.Count == 0 && !awaitingVerification) { <div class="alert alert-info">No files are available.</div> }
+@foreach (var file in Model)
+{
+    <article class="card p-4 mb-3">
+        <div class="d-flex flex-wrap justify-content-between gap-3">
+            <div><h2 class="h5 text-break">@file.Name</h2><p class="small mt-2">@((file.Size / 1024d).ToString("N1")) KB · @file.UploadedUtc.ToString("dd MMM yyyy") UTC</p></div>
+            <a class="btn btn-outline-danger align-self-start" href="/files/@(file.Id.ToString("N"))/download">Download</a>
+        </div>
+        @if (!string.IsNullOrEmpty(file.Description)) { <p class="file-description mt-3">@file.Description</p> }
+        @if (admin)
+        {
+            <form method="post" action="/files/@(file.Id.ToString("N"))/description" class="border-top mt-3 pt-3">
+                @Html.AntiForgeryToken()
+                <label for="description-@(file.Id.ToString("N"))" class="form-label">Edit description</label>
+                <textarea id="description-@(file.Id.ToString("N"))" name="description" class="form-control mb-2" rows="3" maxlength="4000">@file.Description</textarea>
+                <button class="btn btn-outline-secondary" type="submit">Save description</button>
+            </form>
+            <p class="small mt-2">Access: @(file.IsPublic ? "Everyone (public)" : "Administrator" + (file.Roles.Length > 0 ? ", " + file.Roles : "")) · @(file.Listed ? "Listed" : "Hidden from lists")</p>
+            <form method="post" action="/files/@(file.Id.ToString("N"))/permissions" class="border-top mt-3 pt-3">
+                @Html.AntiForgeryToken()
+                <label class="me-3"><input type="checkbox" name="isPublic" value="true" checked="@file.IsPublic" /> Public download</label>
+                <label class="me-3"><input type="checkbox" name="listed" value="true" checked="@file.Listed" /> Show in list</label>
+                <fieldset class="my-3"><legend class="fs-6">Private download roles</legend>
+                    @foreach (var role in roles.Where(r => r != "Administrator")) { <label class="me-3"><input type="checkbox" name="allowedRoles" value="@role" checked="@(file.Roles.Split(',').Contains(role))" /> @role</label> }
+                </fieldset>
+                <button class="btn btn-outline-danger" type="submit">Save access</button>
+            </form>
+            <details class="mt-3"><summary>Delete file</summary><form method="post" action="/files/@(file.Id.ToString("N"))/delete" class="mt-2">@Html.AntiForgeryToken()<p class="small mb-2">Permanently delete @file.Name?</p><button class="btn btn-danger" type="submit">Permanently delete</button></form></details>
+        }
+    </article>
+}

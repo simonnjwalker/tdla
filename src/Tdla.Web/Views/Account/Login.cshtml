@@ -1,0 +1,18 @@
+@model AccountInput
+@{ ViewData["Title"] = "Sign in"; }
+<div class="card account-card p-4 p-md-5 mx-auto">
+    <h1 class="h3 mb-3">Member sign in</h1>
+    <p class="mb-4">Sign in to access your association files.</p>
+    <form method="post" action="/account/login">
+        @Html.AntiForgeryToken()
+        <div asp-validation-summary="All" class="text-danger" role="alert"></div>
+        <label asp-for="Username" class="form-label">Username</label>
+        <input asp-for="Username" class="form-control mb-3" autocomplete="username" required maxlength="256" />
+        <label asp-for="Password" class="form-label"></label>
+        <input name="Password" id="Password" type="password" class="form-control mb-4" autocomplete="current-password" required />
+        <button class="main-btn" type="submit">Sign in</button>
+    </form>
+    <p class="mt-4"><a href="/account/register">Create an account</a></p>
+    <p class="mt-2"><a href="/account/forgot-username">Forgot username?</a> · <a href="/account/forgot-password">Forgot password?</a></p>
+    <p class="mt-2 small">Invited accounts use their email address as their username.</p>
+</div>

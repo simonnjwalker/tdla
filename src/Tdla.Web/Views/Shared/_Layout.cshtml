@@ -1,0 +1,38 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>@ViewData["Title"] — Townsville District Law Association</title>
+    <link rel="icon" href="/images/favicon.png" />
+    <link rel="stylesheet" href="/css/bootstrap.min.css" />
+    <link rel="stylesheet" href="/css/style.css" />
+    <link rel="stylesheet" href="/css/portal.css" />
+</head>
+<body class="portal">
+<header class="portal-header">
+    <nav class="container navbar navbar-expand-md navbar-dark" aria-label="Main navigation">
+        <a class="navbar-brand" href="/"><img src="/images/fulllogo-light.webp" alt="Townsville District Law Association" width="210" /></a>
+        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#portal-nav" aria-controls="portal-nav" aria-expanded="false" aria-label="Toggle navigation"><span class="navbar-toggler-icon"></span></button>
+        <div class="collapse navbar-collapse" id="portal-nav">
+            <ul class="navbar-nav ms-auto align-items-md-center gap-md-3">
+                <li class="nav-item"><a class="nav-link" href="/">Home</a></li>
+                <li class="nav-item"><a class="nav-link" href="/files">Files</a></li>
+                @if (User.IsInRole("Administrator")) { <li class="nav-item"><a class="nav-link" href="/admin">Administration</a></li> }
+                @if (User.Identity?.IsAuthenticated == true)
+                {
+                    <li class="nav-item"><form action="/account/logout" method="post">@Html.AntiForgeryToken()<button class="btn btn-outline-light" type="submit">Sign Out</button></form></li>
+                }
+                else { <li class="nav-item"><a class="nav-link" href="/account/login">Sign in</a></li> }
+            </ul>
+        </div>
+    </nav>
+</header>
+<main class="container py-5" id="main">
+    @if (TempData["Message"] is string message) { <div class="alert alert-info" role="status">@message</div> }
+    @RenderBody()
+</main>
+<footer class="container border-top py-4"><p>Townsville District Law Association</p></footer>
+<script src="/js/bootstrap.min.js"></script>
+</body>
+</html>

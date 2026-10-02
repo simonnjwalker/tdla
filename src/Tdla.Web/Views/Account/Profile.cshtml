@@ -1,0 +1,8 @@
+@model ProfileInput
+@{ ViewData["Title"] = "My details"; }
+<div class="card account-card p-4 mx-auto"><h1 class="h3 mb-3">My details</h1>
+<form method="post" action="/account/profile">@Html.AntiForgeryToken()
+<div asp-validation-summary="All" class="text-danger" role="alert"></div>
+<partial name="_ProfileFields" />
+<button class="main-btn" type="submit">Save details</button>
+</form></div>

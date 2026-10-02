@@ -1,0 +1,11 @@
+{
+  "ConnectionStrings": {
+    "Default": "Server=MYSQL_HOST;Port=3306;Database=MYSQL_DATABASE;User=MYSQL_USERNAME;Password=MYSQL_PASSWORD;SslMode=Required"
+  },
+  "Storage": { "Path": "C:\\Inetpub\\vhosts\\tdla.com.au\\private\\tdla-data" },
+  "Site": { "PublicUrl": "https://tdla.com.au" },
+  "Bootstrap": { "AdminPassword": "REPLACE_WITH_YOUR_CHOSEN_PASSWORD" },
+  "Smtp": {
+    "LegacyConfigPath": "C:\\Inetpub\\vhosts\\tdla.com.au\\httpdocs\\php\\info.php"
+  }
+}

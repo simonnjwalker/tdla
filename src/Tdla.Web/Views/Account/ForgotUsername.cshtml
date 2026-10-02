@@ -1,0 +1,8 @@
+@model RecoveryInput
+@{ ViewData["Title"] = "Forgot username"; }
+<div class="card account-card p-4 mx-auto"><h1 class="h3 mb-3">Forgot your username?</h1><p class="mb-4">Enter your account email address and we will email your username to you.</p>
+<form action="/account/forgot-username" method="post">@Html.AntiForgeryToken()
+<div asp-validation-summary="All" class="text-danger" role="alert"></div>
+<label asp-for="Email" class="form-label">Email address</label><input asp-for="Email" type="email" class="form-control mb-3" autocomplete="email" maxlength="256" required />
+<button class="main-btn" type="submit">Email my username</button>
+</form><a class="mt-3" href="/account/login">Back to sign in</a></div>

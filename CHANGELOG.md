@@ -1,3 +1,8 @@
+## [1.1.0] - 2026-10-02
+### Added
+* Committee-only file section.
+* User login and account creation.
+
 ## [1.0.7] - 2026-02-04
 ### Updated
 * Changed images to JPG for speed.

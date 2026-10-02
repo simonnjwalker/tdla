@@ -1,0 +1,88 @@
+name: Build, test and publish TDLA
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: tdla-${{ github.ref }}
+  cancel-in-progress: false
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    services:
+      mysql:
+        image: mysql:8.4
+        env:
+          MYSQL_ROOT_PASSWORD: ci-only-root
+          MYSQL_DATABASE: tdla_test
+          MYSQL_USER: tdla
+          MYSQL_PASSWORD: ci-only-password
+        ports: ['3306:3306']
+        options: >-
+          --health-cmd="mysqladmin ping -h localhost"
+          --health-interval=10s --health-timeout=5s --health-retries=15
+    env:
+      ConnectionStrings__Default: Server=127.0.0.1;Port=3306;Database=tdla_test;User=tdla;Password=ci-only-password;SslMode=Required
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: '10.0.x'
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.13'
+      - run: dotnet build src/Tdla.Web -c Release
+      - run: node scripts/test-navbar.cjs
+      - run: python scripts/integration-test.py
+
+  publish:
+    needs: test
+    if: github.event_name != 'pull_request' && github.ref == 'refs/heads/main'
+    runs-on: windows-latest
+    environment: production
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: '10.0.x'
+      - name: Publish self-contained Windows application
+        run: dotnet publish src/Tdla.Web -c Release -r win-x64 --self-contained true -o artifacts/publish
+      - uses: actions/upload-artifact@v4
+        with:
+          name: tdla-windows
+          path: artifacts/publish
+      - name: Install Web Deploy
+        if: vars.PLESK_DEPLOY_ENABLED == 'true'
+        shell: pwsh
+        run: choco install webdeploy --yes --no-progress
+      - name: Publish to Plesk
+        if: vars.PLESK_DEPLOY_ENABLED == 'true'
+        shell: pwsh
+        env:
+          PLESK_SERVER: ${{ secrets.PLESK_SERVER }}
+          PLESK_SITE: ${{ secrets.PLESK_SITE }}
+          PLESK_USERNAME: ${{ secrets.PLESK_USERNAME }}
+          PLESK_PASSWORD: ${{ secrets.PLESK_PASSWORD }}
+          TDLA_CONFIG_FILE: ${{ vars.TDLA_CONFIG_FILE }}
+        run: ./scripts/deploy-plesk.ps1 -PublishDirectory artifacts/publish
+      - name: Check hosted application
+        if: vars.PLESK_DEPLOY_ENABLED == 'true'
+        shell: pwsh
+        run: |
+          $ready = $false
+          for ($attempt = 0; $attempt -lt 12; $attempt++) {
+            try {
+              $result = Invoke-RestMethod 'https://tdla.com.au/health'
+              if ($result.status -eq 'ok') { $ready = $true; break }
+            } catch { }
+            Start-Sleep -Seconds 5
+          }
+          if (-not $ready) { throw 'Deployment completed, but the website health check failed.' }
